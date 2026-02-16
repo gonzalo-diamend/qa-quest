@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { getMissionById } from "@qa-quest/content";

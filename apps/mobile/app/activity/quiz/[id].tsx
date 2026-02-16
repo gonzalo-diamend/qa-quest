@@ -62,6 +62,20 @@ export default function Quiz() {
         </Pressable>
       ))}
 
+      {isReviewed ? (
+        <View
+          style={{
+            padding: 12,
+            borderRadius: 12,
+            backgroundColor: isCorrect ? "#dcfce7" : "#fee2e2",
+            gap: 4
+          }}
+        >
+          <Text style={{ fontWeight: "900" }}>{isCorrect ? "✅ Correcto" : "❌ Incorrecto"}</Text>
+          <Text>{question.explanation}</Text>
+        </View>
+      ) : null}
+
       <Pressable
         onPress={goNextOrFinish}
         style={{

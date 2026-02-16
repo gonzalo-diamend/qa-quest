@@ -4,6 +4,8 @@ import { allMissions } from "@qa-quest/content";
 
 export default function Home() {
   const router = useRouter();
+  const attempts = useProgressStore((state) => state.attempts);
+  const summary = getProgressSummary(attempts);
 
   return (
     <View style={{ padding: 24, gap: 12 }}>
