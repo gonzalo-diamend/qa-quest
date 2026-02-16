@@ -1,46 +1,80 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
+import { getMissionById } from "@qa-quest/content";
+import { scoreQuiz } from "@qa-quest/shared";
 
 export default function Quiz() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const [ans, setAns] = useState<number | null>(null);
+  const mission = useMemo(() => getMissionById(String(id)), [id]);
 
-  const question = {
-    prompt: "¿Qué define mejor un bug?",
-    options: ["Algo que no me gusta", "Desviación del comportamiento esperado"],
-    correctIndex: 1
-  };
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, number>>({});
 
-  const score = ans === null ? 0 : ans === question.correctIndex ? 100 : 0;
+  if (!mission || mission.activity.type !== "quiz") {
+    return (
+      <View style={{ padding: 24 }}>
+        <Text>Quiz no disponible para esta misión.</Text>
+      </View>
+    );
+  }
+
+  const question = mission.activity.questions[currentQuestionIndex];
+  const selected = answersByQuestionId[question.id];
+  const isLast = currentQuestionIndex === mission.activity.questions.length - 1;
+
+  function goNextOrFinish() {
+    if (isLast) {
+      const result = scoreQuiz(mission.activity, { answersByQuestionId });
+      router.replace(`/result/${mission.id}?score=${result.score}`);
+      return;
+    }
+
+    setCurrentQuestionIndex((q) => q + 1);
+  }
 
   return (
-    <View style={{ padding: 40, gap: 12 }}>
+    <View style={{ padding: 24, gap: 12 }}>
+      <Text style={{ opacity: 0.6 }}>
+        Pregunta {currentQuestionIndex + 1} de {mission.activity.questions.length}
+      </Text>
       <Text style={{ fontSize: 18, fontWeight: "900" }}>{question.prompt}</Text>
 
-      {question.options.map((o, i) => (
+      {question.options.map((option, index) => (
         <Pressable
-          key={i}
-          onPress={() => setAns(i)}
+          key={index}
+          onPress={() =>
+            setAnswersByQuestionId((prev) => ({
+              ...prev,
+              [question.id]: index
+            }))
+          }
           style={{
             padding: 12,
             borderRadius: 12,
-            backgroundColor: ans === i ? "#111" : "#eee"
+            backgroundColor: selected === index ? "#111" : "#eee"
           }}
         >
-          <Text style={{ color: ans === i ? "white" : "black", fontWeight: "800" }}>
-            {o}
+          <Text style={{ color: selected === index ? "white" : "black", fontWeight: "800" }}>
+            {option}
           </Text>
         </Pressable>
       ))}
 
       <Pressable
-        onPress={() => router.replace(`/result/${String(id)}?score=${score}`)}
-        style={{ padding: 12, backgroundColor: "#111", borderRadius: 12, opacity: ans === null ? 0.5 : 1 }}
-        disabled={ans === null}
+        onPress={goNextOrFinish}
+        style={{
+          padding: 12,
+          backgroundColor: "#111",
+          borderRadius: 12,
+          opacity: selected === undefined ? 0.5 : 1
+        }}
+        disabled={selected === undefined}
       >
-        <Text style={{ color: "white", fontWeight: "900" }}>Finalizar</Text>
+        <Text style={{ color: "white", fontWeight: "900" }}>
+          {isLast ? "Finalizar" : "Siguiente"}
+        </Text>
       </Pressable>
     </View>
   );
