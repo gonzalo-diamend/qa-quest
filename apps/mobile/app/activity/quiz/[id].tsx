@@ -20,14 +20,13 @@ export default function Quiz() {
     );
   }
 
-  const activity = mission.activity;
-  const question = activity.questions[currentQuestionIndex];
+  const question = mission.activity.questions[currentQuestionIndex];
   const selected = answersByQuestionId[question.id];
-  const isLast = currentQuestionIndex === activity.questions.length - 1;
+  const isLast = currentQuestionIndex === mission.activity.questions.length - 1;
 
   function goNextOrFinish() {
     if (isLast) {
-      const result = scoreQuiz(activity, { answersByQuestionId });
+      const result = scoreQuiz(mission.activity, { answersByQuestionId });
       router.replace(`/result/${mission.id}?score=${result.score}`);
       return;
     }
@@ -38,7 +37,7 @@ export default function Quiz() {
   return (
     <View style={{ padding: 24, gap: 12 }}>
       <Text style={{ opacity: 0.6 }}>
-        Pregunta {currentQuestionIndex + 1} de {activity.questions.length}
+        Pregunta {currentQuestionIndex + 1} de {mission.activity.questions.length}
       </Text>
       <Text style={{ fontSize: 18, fontWeight: "900" }}>{question.prompt}</Text>
 
