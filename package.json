@@ -1,6 +1,12 @@
 {
   "name": "qa-quest",
   "private": true,
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "start": "pnpm --filter qa-quest-mobile start",
+    "android": "pnpm --filter qa-quest-mobile android",
+    "ios": "pnpm --filter qa-quest-mobile ios",
+    "typecheck": "pnpm --filter qa-quest-mobile typecheck",
+    "test": "node --test --experimental-strip-types packages/shared/src/scoring.test.ts packages/content/src/missions.test.ts"
+  }
 }
-

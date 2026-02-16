@@ -1,46 +1,111 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
+import { getMissionById } from "@qa-quest/content";
+import { scoreQuiz } from "@qa-quest/shared";
 
 export default function Quiz() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const [ans, setAns] = useState<number | null>(null);
+  const mission = useMemo(() => getMissionById(String(id)), [id]);
 
-  const question = {
-    prompt: "¿Qué define mejor un bug?",
-    options: ["Algo que no me gusta", "Desviación del comportamiento esperado"],
-    correctIndex: 1
-  };
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, number>>({});
+  const [reviewedByQuestionId, setReviewedByQuestionId] = useState<Record<string, boolean>>({});
 
-  const score = ans === null ? 0 : ans === question.correctIndex ? 100 : 0;
+  if (!mission || mission.activity.type !== "quiz") {
+    return (
+      <View style={{ padding: 24 }}>
+        <Text>Quiz no disponible para esta misión.</Text>
+      </View>
+    );
+  }
+
+  const activity = mission.activity;
+  const question = activity.questions[currentQuestionIndex];
+  const selected = answersByQuestionId[question.id];
+  const isReviewed = reviewedByQuestionId[question.id] === true;
+  const isCorrect = selected === question.correctIndex;
+  const isLast = currentQuestionIndex === activity.questions.length - 1;
+
+  function onPrimaryAction() {
+    if (selected === undefined) {
+      return;
+    }
+
+    if (!isReviewed) {
+      setReviewedByQuestionId((prev) => ({ ...prev, [question.id]: true }));
+      return;
+    }
+
+    if (isLast) {
+      const result = scoreQuiz(activity, { answersByQuestionId });
+      router.replace(`/result/${mission.id}?score=${result.score}`);
+      return;
+    }
+
+    setCurrentQuestionIndex((q) => q + 1);
+  }
+
+  const buttonLabel = !isReviewed ? "Ver feedback" : isLast ? "Finalizar" : "Siguiente";
 
   return (
-    <View style={{ padding: 40, gap: 12 }}>
+    <View style={{ padding: 24, gap: 12 }}>
+      <Text style={{ opacity: 0.6 }}>
+        Pregunta {currentQuestionIndex + 1} de {activity.questions.length}
+      </Text>
       <Text style={{ fontSize: 18, fontWeight: "900" }}>{question.prompt}</Text>
 
-      {question.options.map((o, i) => (
+      {question.options.map((option, index) => (
         <Pressable
-          key={i}
-          onPress={() => setAns(i)}
+          key={index}
+          onPress={() => {
+            if (isReviewed) {
+              return;
+            }
+            setAnswersByQuestionId((prev) => ({
+              ...prev,
+              [question.id]: index
+            }));
+          }}
           style={{
             padding: 12,
             borderRadius: 12,
-            backgroundColor: ans === i ? "#111" : "#eee"
+            backgroundColor: selected === index ? "#111" : "#eee",
+            opacity: isReviewed && selected !== index ? 0.7 : 1
           }}
         >
-          <Text style={{ color: ans === i ? "white" : "black", fontWeight: "800" }}>
-            {o}
+          <Text style={{ color: selected === index ? "white" : "black", fontWeight: "800" }}>
+            {option}
           </Text>
         </Pressable>
       ))}
 
+      {isReviewed ? (
+        <View
+          style={{
+            padding: 12,
+            borderRadius: 12,
+            backgroundColor: isCorrect ? "#dcfce7" : "#fee2e2",
+            gap: 4
+          }}
+        >
+          <Text style={{ fontWeight: "900" }}>{isCorrect ? "✅ Correcto" : "❌ Incorrecto"}</Text>
+          <Text>{question.explanation}</Text>
+        </View>
+      ) : null}
+
       <Pressable
-        onPress={() => router.replace(`/result/${String(id)}?score=${score}`)}
-        style={{ padding: 12, backgroundColor: "#111", borderRadius: 12, opacity: ans === null ? 0.5 : 1 }}
-        disabled={ans === null}
+        onPress={onPrimaryAction}
+        style={{
+          padding: 12,
+          backgroundColor: "#111",
+          borderRadius: 12,
+          opacity: selected === undefined ? 0.5 : 1
+        }}
+        disabled={selected === undefined}
       >
-        <Text style={{ color: "white", fontWeight: "900" }}>Finalizar</Text>
+        <Text style={{ color: "white", fontWeight: "900" }}>{buttonLabel}</Text>
       </Pressable>
     </View>
   );
