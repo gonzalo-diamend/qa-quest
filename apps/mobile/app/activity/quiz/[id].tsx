@@ -11,7 +11,6 @@ export default function Quiz() {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, number>>({});
-  const [reviewedByQuestionId, setReviewedByQuestionId] = useState<Record<string, boolean>>({});
 
   if (!mission || mission.activity.type !== "quiz") {
     return (
@@ -21,25 +20,13 @@ export default function Quiz() {
     );
   }
 
-  const activity = mission.activity;
-  const question = activity.questions[currentQuestionIndex];
+  const question = mission.activity.questions[currentQuestionIndex];
   const selected = answersByQuestionId[question.id];
-  const isReviewed = reviewedByQuestionId[question.id] === true;
-  const isCorrect = selected === question.correctIndex;
-  const isLast = currentQuestionIndex === activity.questions.length - 1;
+  const isLast = currentQuestionIndex === mission.activity.questions.length - 1;
 
-  function onPrimaryAction() {
-    if (selected === undefined) {
-      return;
-    }
-
-    if (!isReviewed) {
-      setReviewedByQuestionId((prev) => ({ ...prev, [question.id]: true }));
-      return;
-    }
-
+  function goNextOrFinish() {
     if (isLast) {
-      const result = scoreQuiz(activity, { answersByQuestionId });
+      const result = scoreQuiz(mission.activity, { answersByQuestionId });
       router.replace(`/result/${mission.id}?score=${result.score}`);
       return;
     }
@@ -47,32 +34,26 @@ export default function Quiz() {
     setCurrentQuestionIndex((q) => q + 1);
   }
 
-  const buttonLabel = !isReviewed ? "Ver feedback" : isLast ? "Finalizar" : "Siguiente";
-
   return (
     <View style={{ padding: 24, gap: 12 }}>
       <Text style={{ opacity: 0.6 }}>
-        Pregunta {currentQuestionIndex + 1} de {activity.questions.length}
+        Pregunta {currentQuestionIndex + 1} de {mission.activity.questions.length}
       </Text>
       <Text style={{ fontSize: 18, fontWeight: "900" }}>{question.prompt}</Text>
 
       {question.options.map((option, index) => (
         <Pressable
           key={index}
-          onPress={() => {
-            if (isReviewed) {
-              return;
-            }
+          onPress={() =>
             setAnswersByQuestionId((prev) => ({
               ...prev,
               [question.id]: index
-            }));
-          }}
+            }))
+          }
           style={{
             padding: 12,
             borderRadius: 12,
-            backgroundColor: selected === index ? "#111" : "#eee",
-            opacity: isReviewed && selected !== index ? 0.7 : 1
+            backgroundColor: selected === index ? "#111" : "#eee"
           }}
         >
           <Text style={{ color: selected === index ? "white" : "black", fontWeight: "800" }}>
@@ -96,7 +77,7 @@ export default function Quiz() {
       ) : null}
 
       <Pressable
-        onPress={onPrimaryAction}
+        onPress={goNextOrFinish}
         style={{
           padding: 12,
           backgroundColor: "#111",
@@ -105,7 +86,9 @@ export default function Quiz() {
         }}
         disabled={selected === undefined}
       >
-        <Text style={{ color: "white", fontWeight: "900" }}>{buttonLabel}</Text>
+        <Text style={{ color: "white", fontWeight: "900" }}>
+          {isLast ? "Finalizar" : "Siguiente"}
+        </Text>
       </Pressable>
     </View>
   );
