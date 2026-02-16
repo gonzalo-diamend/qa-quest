@@ -1,0 +1,12 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@qa-quest/shared": ["../../packages/shared/src"],
+      "@qa-quest/content": ["../../packages/content/src"]
+    }
+  }
+}
+
