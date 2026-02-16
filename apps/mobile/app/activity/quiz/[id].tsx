@@ -1,33 +1,47 @@
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { getMissionById } from "@qa-quest/content";
-import { scoreQuiz } from "@qa-quest/shared";
-import { View, Text, Button } from "react-native";
+import { View, Text, Pressable } from "react-native";
 
 export default function Quiz() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const mission = getMissionById(String(id));
+  const [ans, setAns] = useState<number | null>(null);
 
-  const [answer, setAnswer] = useState<number | null>(null);
+  const question = {
+    prompt: "¿Qué define mejor un bug?",
+    options: ["Algo que no me gusta", "Desviación del comportamiento esperado"],
+    correctIndex: 1
+  };
 
-  if (!mission || mission.activity.type !== "quiz") return null;
-
-  function finish() {
-    const result = scoreQuiz(mission.activity, {
-      answersByQuestionId: { q1: answer }
-    });
-
-    router.replace(`/result/${mission.id}?score=${result.score}`);
-  }
+  const score = ans === null ? 0 : ans === question.correctIndex ? 100 : 0;
 
   return (
-    <View style={{ padding: 40 }}>
-      <Text>{mission.activity.questions[0].prompt}</Text>
-      {mission.activity.questions[0].options.map((o, i) => (
-        <Button key={i} title={o} onPress={() => setAnswer(i)} />
+    <View style={{ padding: 40, gap: 12 }}>
+      <Text style={{ fontSize: 18, fontWeight: "900" }}>{question.prompt}</Text>
+
+      {question.options.map((o, i) => (
+        <Pressable
+          key={i}
+          onPress={() => setAns(i)}
+          style={{
+            padding: 12,
+            borderRadius: 12,
+            backgroundColor: ans === i ? "#111" : "#eee"
+          }}
+        >
+          <Text style={{ color: ans === i ? "white" : "black", fontWeight: "800" }}>
+            {o}
+          </Text>
+        </Pressable>
       ))}
-      <Button title="Finish" onPress={finish} />
+
+      <Pressable
+        onPress={() => router.replace(`/result/${String(id)}?score=${score}`)}
+        style={{ padding: 12, backgroundColor: "#111", borderRadius: 12, opacity: ans === null ? 0.5 : 1 }}
+        disabled={ans === null}
+      >
+        <Text style={{ color: "white", fontWeight: "900" }}>Finalizar</Text>
+      </Pressable>
     </View>
   );
 }
