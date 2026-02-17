@@ -41,5 +41,66 @@ export const missions: Mission[] = [
         }
       ]
     }
+  },
+  {
+    id: "qa-002",
+    version: 1,
+    title: "Test Cases 101",
+    description: "Aprendé a escribir casos de prueba efectivos.",
+    difficulty: "easy",
+    xp: 25,
+    lessonBlocks: [
+      {
+        type: "text",
+        text: "Un caso de prueba define una condición de entrada, los pasos a seguir y el resultado esperado."
+      },
+      {
+        type: "tip",
+        text: "Un buen caso de prueba es reproducible, independiente y tiene un solo resultado esperado claro."
+      },
+      {
+        type: "text",
+        text: "Los casos de prueba pueden ser positivos (flujo feliz) o negativos (flujos de error y borde)."
+      }
+    ],
+    activity: {
+      type: "quiz",
+      instruction: "Seleccioná la opción correcta",
+      questions: [
+        {
+          id: "tc-q1",
+          prompt: "¿Cuál es un componente esencial de un caso de prueba?",
+          options: [
+            "El nombre del tester que lo ejecuta",
+            "El resultado esperado",
+            "La fecha de creación"
+          ],
+          correctIndex: 1,
+          explanation: "El resultado esperado es clave: sin él no podés determinar si la prueba pasó o falló."
+        },
+        {
+          id: "tc-q2",
+          prompt: "Un test case negativo sirve para...",
+          options: [
+            "Verificar que el sistema funciona correctamente con datos válidos",
+            "Verificar que el sistema maneja correctamente entradas inválidas o inesperadas",
+            "Medir el tiempo de respuesta del sistema"
+          ],
+          correctIndex: 1,
+          explanation: "Los test cases negativos validan que el sistema maneja errores y casos borde sin romperse."
+        },
+        {
+          id: "tc-q3",
+          prompt: "¿Qué significa que un caso de prueba sea 'independiente'?",
+          options: [
+            "Que puede ejecutarse sin depender del resultado de otros test cases",
+            "Que fue escrito sin ayuda de otros testers",
+            "Que no necesita datos de entrada"
+          ],
+          correctIndex: 0,
+          explanation: "La independencia garantiza que si un test falla, el problema está aislado y no en una dependencia externa."
+        }
+      ]
+    }
   }
 ];
