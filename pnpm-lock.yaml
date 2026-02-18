@@ -10,6 +10,12 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@qa-quest/content':
+        specifier: workspace:*
+        version: link:../../packages/content
+      '@qa-quest/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@react-native-async-storage/async-storage':
         specifier: ^1.23.1
         version: 1.24.0(react-native@0.74.5(@babel/core@7.29.0)(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@types/react@19.1.17)(react@18.2.0))
@@ -28,6 +34,11 @@ importers:
       zustand:
         specifier: ^4.5.2
         version: 4.5.7(@types/react@19.1.17)(react@18.2.0)
+
+    devDependencies:
+      typescript:
+        specifier: ~5.3.3
+        version: 5.9.3
 
   packages/content:
     dependencies:
