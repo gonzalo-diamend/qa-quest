@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { missions as allMissions } from "./missions/qa.ts";
+import { missions as allMissions } from "./missions/qa";
 
 test("missions have unique IDs", () => {
   const ids = allMissions.map((mission) => mission.id);
