@@ -1,6 +1,7 @@
 import { Alert, Pressable, Text, View } from "react-native";
 import { getMissionById } from "@qa-quest/content";
 import { getProgressSummary, useProgressStore } from "../store/progress";
+import { theme } from "../theme";
 
 export default function ProgressScreen() {
   const attempts = useProgressStore((state) => state.attempts);
@@ -9,15 +10,15 @@ export default function ProgressScreen() {
   const summary = getProgressSummary(attempts);
 
   return (
-    <View style={{ padding: 24, gap: 12 }}>
-      <Text style={{ fontSize: 24, fontWeight: "900" }}>Tu progreso</Text>
-      <Text style={{ opacity: 0.8 }}>Intentos totales: {summary.totalAttempts}</Text>
-      <Text style={{ opacity: 0.8 }}>Promedio global: {summary.averageScore}</Text>
-      <Text style={{ opacity: 0.8 }}>Misiones completadas: {summary.completedMissions}</Text>
+    <View style={{ flex: 1, padding: theme.spacing.page, gap: theme.spacing.md, backgroundColor: theme.colors.bg }}>
+      <Text style={{ fontSize: 24, fontWeight: "900", color: theme.colors.text }}>Tu progreso</Text>
+      <Text style={{ color: theme.colors.muted }}>Intentos totales: {summary.totalAttempts}</Text>
+      <Text style={{ color: theme.colors.muted }}>Promedio global: {summary.averageScore}</Text>
+      <Text style={{ color: theme.colors.muted }}>Misiones completadas: {summary.completedMissions}</Text>
 
-      <View style={{ marginTop: 8, gap: 8 }}>
+      <View style={{ marginTop: theme.spacing.sm, gap: theme.spacing.sm }}>
         {Object.entries(summary.bestScoreByMission).length === 0 ? (
-          <Text style={{ opacity: 0.7 }}>Todavía no completaste ninguna misión.</Text>
+          <Text style={{ color: theme.colors.muted }}>Todavía no completaste ninguna misión.</Text>
         ) : (
           Object.entries(summary.bestScoreByMission).map(([missionId, bestScore]) => {
             const mission = getMissionById(missionId);
@@ -26,13 +27,13 @@ export default function ProgressScreen() {
                 key={missionId}
                 style={{
                   padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: "#f4f4f5",
+                  borderRadius: theme.radius.md,
+                  backgroundColor: theme.colors.surface,
                   gap: 4
                 }}
               >
-                <Text style={{ fontWeight: "900" }}>{mission?.title ?? missionId}</Text>
-                <Text style={{ opacity: 0.8 }}>Mejor score: {bestScore}</Text>
+                <Text style={{ fontWeight: "900", color: theme.colors.text }}>{mission?.title ?? missionId}</Text>
+                <Text style={{ color: theme.colors.muted }}>Mejor score: {bestScore}</Text>
               </View>
             );
           })
@@ -46,9 +47,9 @@ export default function ProgressScreen() {
             { text: "Borrar", style: "destructive", onPress: resetProgress }
           ]);
         }}
-        style={{ padding: 12, backgroundColor: "#7f1d1d", borderRadius: 12 }}
+        style={{ padding: 12, backgroundColor: theme.colors.dangerBg, borderRadius: theme.radius.md }}
       >
-        <Text style={{ color: "white", fontWeight: "900" }}>Borrar progreso</Text>
+        <Text style={{ color: theme.colors.primaryText, fontWeight: "900", textAlign: "center" }}>Borrar progreso</Text>
       </Pressable>
     </View>
   );

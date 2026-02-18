@@ -6,6 +6,7 @@
     "start": "pnpm --filter qa-quest-mobile start",
     "android": "pnpm --filter qa-quest-mobile android",
     "ios": "pnpm --filter qa-quest-mobile ios",
-    "typecheck": "pnpm --filter qa-quest-mobile typecheck"
+    "typecheck": "pnpm --filter qa-quest-mobile typecheck",
+    "check": "node_modules/.bin/tsc -p apps/mobile/tsconfig.json --noEmit && node --test packages/shared/src/scoring.test.ts packages/content/src/missions.test.ts"
   }
 }

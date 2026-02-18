@@ -72,6 +72,22 @@ Desde `apps/mobile`:
 - `pnpm ios`
 - `pnpm typecheck`
 
+
+## Checklist de aceptación MVP (Fase 1)
+
+Para cerrar el MVP demo hoy, validar manualmente en Android/iOS:
+
+- [ ] La app abre y renderiza Home sin errores.
+- [ ] Se visualizan al menos 2 misiones en Home.
+- [ ] Se puede entrar a una misión y ver bloques de lección.
+- [ ] Se puede iniciar quiz y responder preguntas.
+- [ ] Al finalizar, el score mostrado coincide con respuestas correctas.
+- [ ] El intento queda persistido y aparece en `Progreso`.
+- [ ] Al reiniciar la app, el progreso sigue presente (persistencia local).
+- [ ] La acción `Borrar progreso` limpia los datos y la vista se actualiza.
+
+Criterio de salida de Fase 1: todos los checks en verde + sin crashes durante el recorrido completo de 2 misiones.
+
 ## Roadmap sugerido (siguiente iteración)
 
 - Persistencia de progreso local (AsyncStorage + store global).
@@ -79,6 +95,10 @@ Desde `apps/mobile`:
 - Múltiples misiones en `packages/content`.
 - Feedback por pregunta (mostrar explicación antes de avanzar).
 - Tests unitarios para `scoreQuiz` y validación de contenido de misiones.
+
+## Publicación (Fase 3)
+
+Ver checklist detallado en `docs/release/phase-3-checklist.md`.
 
 ## Notas Expo/Web
 
