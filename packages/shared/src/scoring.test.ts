@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { scoreQuiz } from "./scoring.ts";
+import { scoreQuiz } from "./scoring";
 
 test("scoreQuiz returns 100 when all answers are correct", () => {
   const activity = {

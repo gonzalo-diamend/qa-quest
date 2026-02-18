@@ -7,6 +7,6 @@
     "android": "pnpm --filter qa-quest-mobile android",
     "ios": "pnpm --filter qa-quest-mobile ios",
     "typecheck": "pnpm --filter qa-quest-mobile typecheck",
-    "check": "pnpm --filter qa-quest-mobile typecheck && node --test packages/shared/src/scoring.test.ts packages/content/src/missions.test.ts"
+    "check": "pnpm --filter qa-quest-mobile typecheck && node node_modules/typescript/bin/tsc --module nodenext --moduleResolution nodenext --target es2022 --outDir .tmp-node-test packages/shared/src/types.ts packages/shared/src/scoring.ts packages/shared/src/scoring.test.ts packages/content/src/missions/qa.ts packages/content/src/missions.test.ts && node --test .tmp-node-test/shared/src/scoring.test.js .tmp-node-test/content/src/missions.test.js"
   }
 }
