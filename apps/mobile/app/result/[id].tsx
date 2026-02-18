@@ -2,12 +2,25 @@ import { useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { getMissionById } from "@qa-quest/content";
+import { useProgressStore } from "../../store/progress";
 
 export default function Result() {
   const { id, score } = useLocalSearchParams<{ id: string; score: string }>();
   const router = useRouter();
   const mission = getMissionById(String(id));
   const numericScore = Number(score ?? 0);
+  const addAttempt = useProgressStore((state) => state.addAttempt);
+
+  useEffect(() => {
+    if (id) {
+      addAttempt({
+        missionId: String(id),
+        score: numericScore,
+        completedAt: new Date().toISOString()
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const feedback =
     numericScore >= 80
@@ -20,8 +33,10 @@ export default function Result() {
     <View style={{ padding: 24, gap: 12 }}>
       <Text style={{ fontSize: 22, fontWeight: "900" }}>Resultado</Text>
       <Text style={{ opacity: 0.8 }}>{mission?.title ?? "Misión"}</Text>
-      <Text style={{ opacity: 0.8 }}>Score: {numericScore}</Text>
-      <Text style={{ fontWeight: "700" }}>{feedback}</Text>
+      <Text style={{ fontSize: 32, fontWeight: "900", textAlign: "center", marginVertical: 8 }}>
+        {numericScore} pts
+      </Text>
+      <Text style={{ fontWeight: "700", textAlign: "center" }}>{feedback}</Text>
 
       <Pressable
         onPress={() => router.replace("/")}

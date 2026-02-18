@@ -11,6 +11,7 @@ export default function Quiz() {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, number>>({});
+  const [reviewed, setReviewed] = useState<Record<string, boolean>>({});
 
   if (!mission || mission.activity.type !== "quiz") {
     return (
@@ -22,15 +23,20 @@ export default function Quiz() {
 
   const question = mission.activity.questions[currentQuestionIndex];
   const selected = answersByQuestionId[question.id];
+  const isReviewed = reviewed[question.id] === true;
+  const isCorrect = isReviewed && selected === question.correctIndex;
   const isLast = currentQuestionIndex === mission.activity.questions.length - 1;
+
+  function handleReview() {
+    setReviewed((prev) => ({ ...prev, [question.id]: true }));
+  }
 
   function goNextOrFinish() {
     if (isLast) {
-      const result = scoreQuiz(mission.activity, { answersByQuestionId });
-      router.replace(`/result/${mission.id}?score=${result.score}`);
+      const result = scoreQuiz(mission!.activity, { answersByQuestionId });
+      router.replace(`/result/${mission!.id}?score=${result.score}`);
       return;
     }
-
     setCurrentQuestionIndex((q) => q + 1);
   }
 
@@ -44,12 +50,14 @@ export default function Quiz() {
       {question.options.map((option, index) => (
         <Pressable
           key={index}
-          onPress={() =>
-            setAnswersByQuestionId((prev) => ({
-              ...prev,
-              [question.id]: index
-            }))
-          }
+          onPress={() => {
+            if (!isReviewed) {
+              setAnswersByQuestionId((prev) => ({
+                ...prev,
+                [question.id]: index
+              }));
+            }
+          }}
           style={{
             padding: 12,
             borderRadius: 12,
@@ -74,22 +82,35 @@ export default function Quiz() {
           <Text style={{ fontWeight: "900" }}>{isCorrect ? "✅ Correcto" : "❌ Incorrecto"}</Text>
           <Text>{question.explanation}</Text>
         </View>
-      ) : null}
+      ) : (
+        <Pressable
+          onPress={handleReview}
+          style={{
+            padding: 12,
+            backgroundColor: "#555",
+            borderRadius: 12,
+            opacity: selected === undefined ? 0.5 : 1
+          }}
+          disabled={selected === undefined}
+        >
+          <Text style={{ color: "white", fontWeight: "900" }}>Verificar respuesta</Text>
+        </Pressable>
+      )}
 
-      <Pressable
-        onPress={goNextOrFinish}
-        style={{
-          padding: 12,
-          backgroundColor: "#111",
-          borderRadius: 12,
-          opacity: selected === undefined ? 0.5 : 1
-        }}
-        disabled={selected === undefined}
-      >
-        <Text style={{ color: "white", fontWeight: "900" }}>
-          {isLast ? "Finalizar" : "Siguiente"}
-        </Text>
-      </Pressable>
+      {isReviewed && (
+        <Pressable
+          onPress={goNextOrFinish}
+          style={{
+            padding: 12,
+            backgroundColor: "#111",
+            borderRadius: 12
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "900" }}>
+            {isLast ? "Finalizar" : "Siguiente"}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
