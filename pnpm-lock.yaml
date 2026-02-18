@@ -36,6 +36,9 @@ importers:
         version: 4.5.7(@types/react@19.1.17)(react@18.2.0)
 
     devDependencies:
+      '@types/react':
+        specifier: ^19.1.17
+        version: 19.1.17
       typescript:
         specifier: ~5.3.3
         version: 5.9.3

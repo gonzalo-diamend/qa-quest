@@ -1,4 +1,4 @@
-const isDev = process.env.NODE_ENV !== "production";
+const isDev = typeof __DEV__ !== "undefined" ? __DEV__ : false;
 
 type TelemetryEvent = {
   name: string;
